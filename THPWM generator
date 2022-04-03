@@ -1,0 +1,63 @@
+// Third harmonic PWM wave generator
+// Created by Karol Oniszczuk, github.com/torevus
+// All rights reserved 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+    double sine(double whenv, double freqmultiply, double Res, double Amp);      //Function prototype
+    char R[4];                                                                  // resolution in bits
+    char A[4];                                                                   // amplitude in bits
+    double Rb, Ab, P0b;                             // resolution, amplitude and zero point in double
+    double Outvalue;                                                //variables used in sine function
+    double Amplitude, Resolution, Zeropoint, Result, Sinewave, THswave; //variables used in main loop
+    int X = 2;
+    int whenvalue = 0;
+    double arr[1000];
+    int freqsine = 1;
+    int freqthsine = 3;
+    
+double sine(double whenv, double freqmultiply, double Res, double Amp)
+{
+    Outvalue = (sin(whenv*(freqmultiply*2*M_PI)/Res))*Amp/2;          //The output value of harmonics
+    return Outvalue;
+}
+
+
+int main()
+{
+    
+    // Getting values form user and string to double conversion
+    printf("Enter the resolution in bits\n");
+    fgets(R, sizeof(R), stdin);                 
+    Rb = atof(R);       
+    printf("Enter the amplidude in bits\n");
+    fgets(A, sizeof(A), stdin);
+    Ab = atof(A);
+    
+    P0b = Ab/2 ;
+    
+    printf("The amplitude: %2.0f, The resolution %2.0f, The sinus starts at: %2.1f\n\n", Ab, Rb, P0b);
+    
+    // Next step is converting bits to integer
+    // This is necessary to recieve sinus values
+    
+    Amplitude = pow(X, Ab);     //Amplitude in numbers equals 2^Ab
+    Resolution = pow(X, Rb);    //Resolution the same
+    Zeropoint = Amplitude/2;    //Medium value of curve
+    
+    printf("The amplitude: %10.0f, The resolution %10.0f, Zeropoint %10.0f\n", Amplitude, Resolution, Zeropoint);
+    
+    FILE *f = fopen("text.txt", "w");       //Open file
+    for(int i = 0; i < Resolution; i++ ){
+    Sinewave = sine(whenvalue, freqsine, Resolution, Amplitude);    //The output value of fundamental harmonic
+    THswave =  sine(whenvalue, freqthsine, Resolution, Amplitude);  //The output value of third harmonic
+    Result = Sinewave + THswave;            // The sum node
+    whenvalue ++;
+    arr[whenvalue] = Result;                //saved to the array
+    printf("%4.0f",arr[whenvalue]);
+    fprintf(f,"%4.f\n", arr[whenvalue]);}   //print to file
+    fclose(f);
+    return 0;
+}
